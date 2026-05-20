@@ -1,8 +1,11 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ChargeCard } from '@/components/ChargeCard'
+import { NotificationBar } from '@/components/NotificationBar'
 import { signOut } from '@/app/auth/actions'
 import { getVisibleChargeTypes } from '@/lib/matching'
+import { BottomNav } from '@/components/ui/BottomNav'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -16,13 +19,13 @@ export default async function DashboardPage() {
     .eq('id', user.id)
     .single()
 
-  const transporteurProfile = userProfile?.transporteur_profiles as {
+  const rawProfiles = userProfile?.transporteur_profiles
+  const transporteurProfile = (Array.isArray(rawProfiles) ? rawProfiles[0] : rawProfiles) as {
     type: 'A' | 'B' | 'C'
     description_vehicule: string | null
     score: number
-  } | null
+  } | null | undefined ?? null
 
-  // Build charge query based on user role
   let charges: Array<{
     id: string
     ville_depart: string
@@ -44,7 +47,6 @@ export default async function DashboardPage() {
       .order('created_at', { ascending: false })
     charges = data ?? []
   } else if (userProfile?.role === 'expéditeur') {
-    // Expéditeur sees their own charges
     const { data } = await supabase
       .from('charges')
       .select('*')
@@ -53,83 +55,91 @@ export default async function DashboardPage() {
     charges = data ?? []
   }
 
+  const isTransporteur = userProfile?.role === 'transporteur'
+
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b px-6 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-orange-600">FLEEZ TRUCK</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600">{userProfile?.nom}</span>
+    <div className="min-h-screen bg-surface flex flex-col">
+      <NotificationBar userId={user.id} />
+
+      <header className="bg-white border-b border-border px-4 h-14 flex items-center justify-between sticky top-0 z-10">
+        <h1 className="text-lg font-bold text-nardo">Dottruck</h1>
+        <div className="flex items-center gap-3">
+          <Link href="/notifications" className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface text-gray-500 transition-colors">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+          </Link>
           <form action={signOut}>
-            <button type="submit" className="text-sm text-gray-500 hover:text-red-500 transition">
-              Déconnexion
+            <button type="submit" className="text-sm text-gray-500 hover:text-error transition-colors font-medium">
+              Déco
             </button>
           </form>
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto p-6 space-y-6">
-        {/* Transporteur banner */}
+      <main className="flex-1 px-4 pt-5 pb-24 max-w-lg mx-auto w-full space-y-5">
+        <div>
+          <p className="text-lg font-bold text-nardo">Salut, {userProfile?.nom?.split(' ')[0]} 👋</p>
+          <p className="text-sm text-gray-500 mt-0.5">
+            {isTransporteur
+              ? `${charges.length} charge${charges.length !== 1 ? 's' : ''} disponible${charges.length !== 1 ? 's' : ''}`
+              : `${charges.length} charge${charges.length !== 1 ? 's' : ''} publiée${charges.length !== 1 ? 's' : ''}`}
+          </p>
+        </div>
+
         {transporteurProfile && (
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
-            {transporteurProfile.type === 'A' && (
-              <div>
-                <p className="font-semibold text-orange-800">Vous avez un camion</p>
-                <p className="text-sm text-orange-600 mt-1">
-                  Vous voyez les charges qui nécessitent un camion ou camion + remorque
-                </p>
-              </div>
-            )}
-            {transporteurProfile.type === 'B' && (
-              <div>
-                <p className="font-semibold text-orange-800">Vous avez une remorque</p>
-                <p className="text-sm text-orange-600 mt-1">
-                  Vous voyez les charges qui nécessitent une remorque ou camion + remorque
-                </p>
-              </div>
-            )}
-            {transporteurProfile.type === 'C' && (
-              <p className="font-semibold text-orange-800">
-                Camion + Remorque — vous voyez toutes les charges disponibles
-              </p>
-            )}
+          <div className="bg-accent/5 border border-accent/20 rounded-xl p-4">
+            <p className="text-sm font-medium text-accent">
+              {transporteurProfile.type === 'A' && "Camion seul — cherchez une remorque via l'onglet Matching"}
+              {transporteurProfile.type === 'B' && "Remorque seule — cherchez un camion via l'onglet Matching"}
+              {transporteurProfile.type === 'C' && 'Camion + Remorque — toutes les charges sont visibles'}
+            </p>
           </div>
         )}
 
-        {/* Expéditeur actions */}
-        {userProfile?.role === 'expéditeur' && (
+        {!isTransporteur && (
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-800">Mes charges</h2>
-            <a
+            <p className="text-base font-bold text-nardo">Mes charges</p>
+            <Link
               href="/charges/new"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition text-sm"
+              className="flex items-center gap-1 bg-accent text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-accent-hover transition-all"
             >
-              + Publier une charge
-            </a>
+              + Publier
+            </Link>
           </div>
         )}
 
-        {/* Charge list */}
-        {userProfile?.role === 'transporteur' && (
-          <h2 className="text-lg font-semibold text-gray-800">
-            Charges disponibles ({charges.length})
-          </h2>
+        {isTransporteur && charges.length > 0 && (
+          <p className="text-sm font-bold text-nardo uppercase tracking-wide">Charges près de toi</p>
         )}
 
-        {charges.length > 0 ? (
+        {isTransporteur && !transporteurProfile ? (
+          <div className="text-center py-16 space-y-4">
+            <p className="text-gray-500">Configurez votre profil pour voir les charges.</p>
+            <Link
+              href="/profile/setup"
+              className="inline-flex items-center justify-center min-h-[48px] px-6 bg-accent text-white font-semibold rounded-xl"
+            >
+              Configurer mon profil
+            </Link>
+          </div>
+        ) : charges.length > 0 ? (
           <div className="space-y-3">
             {charges.map(charge => (
               <ChargeCard key={charge.id} charge={charge} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 text-gray-500">
-            {userProfile?.role === 'expéditeur'
-              ? 'Aucune charge publiée. Cliquez sur "+ Publier une charge" pour commencer.'
-              : 'Aucune charge disponible pour le moment.'}
+          <div className="text-center py-16 text-gray-400">
+            {isTransporteur
+              ? 'Aucune charge disponible pour le moment.'
+              : 'Aucune charge publiée. Cliquez sur "+ Publier" pour commencer.'}
           </div>
         )}
-      </div>
-    </main>
+      </main>
+
+      <BottomNav />
+    </div>
   )
 }
