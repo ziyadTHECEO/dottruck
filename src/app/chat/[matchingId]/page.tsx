@@ -1,7 +1,7 @@
 import { redirect, notFound } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ChatRoom } from '@/components/ChatRoom'
+import { TopHeader } from '@/components/ui/TopHeader'
 
 export default async function ChatPage({
   params,
@@ -31,15 +31,7 @@ export default async function ChatPage({
 
   return (
     <div className="h-screen flex flex-col">
-      <header className="h-16 bg-white border-b px-4 flex items-center gap-3 shrink-0">
-        <Link href="/dashboard" className="text-gray-500 hover:text-gray-800">←</Link>
-        <div>
-          <p className="font-semibold text-gray-900">
-            {charge.ville_depart} → {charge.ville_arrivee}
-          </p>
-          <p className="text-xs text-gray-500">Négociation en cours</p>
-        </div>
-      </header>
+      <TopHeader title="Négociation" backHref="/dashboard" />
 
       <ChatRoom
         matchingId={matchingId}

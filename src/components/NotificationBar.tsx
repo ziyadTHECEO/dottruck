@@ -36,7 +36,7 @@ export function NotificationBar({ userId }: { userId: string }) {
         .gte('created_at', since)
 
       if (count && count > 0) {
-        const charge = m.charges as { ville_depart: string; ville_arrivee: string } | null
+        const charge = m.charges as unknown as { ville_depart: string; ville_arrivee: string } | null
         results.push({
           matchingId: m.id,
           villeDepart: charge?.ville_depart ?? '?',
