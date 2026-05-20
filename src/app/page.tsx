@@ -1,65 +1,47 @@
-import Image from "next/image";
+import Link from 'next/link'
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-orange-50 flex flex-col items-center justify-center p-6">
+      <div className="max-w-md w-full text-center space-y-8">
+        {/* Logo */}
+        <div>
+          <h1 className="text-4xl font-bold text-orange-600">FLEEZ TRUCK</h1>
+          <p className="text-gray-600 mt-2">Transport intelligent au Maroc</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        {/* Choix du rôle */}
+        <div className="space-y-4">
+          <p className="text-lg font-medium text-gray-800">Qui êtes-vous ?</p>
+
+          <Link
+            href="/auth/signup?role=transporteur"
+            className="block w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-6 rounded-xl transition text-lg"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Je suis Transporteur
+            <span className="block text-sm font-normal opacity-80 mt-1">
+              J&apos;ai un camion, une remorque, ou les deux
+            </span>
+          </Link>
+
+          <Link
+            href="/auth/signup?role=expéditeur"
+            className="block w-full bg-white hover:bg-gray-50 text-gray-800 font-semibold py-4 px-6 rounded-xl transition text-lg border-2 border-gray-200"
           >
-            Documentation
-          </a>
+            Je suis Expéditeur
+            <span className="block text-sm font-normal text-gray-500 mt-1">
+              J&apos;ai des marchandises à transporter
+            </span>
+          </Link>
         </div>
-      </main>
-    </div>
-  );
+
+        <p className="text-sm text-gray-500">
+          Déjà un compte ?{' '}
+          <Link href="/auth/login" className="text-orange-600 font-medium hover:underline">
+            Se connecter
+          </Link>
+        </p>
+      </div>
+    </main>
+  )
 }
