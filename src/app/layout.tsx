@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'FLEEZ TRUCK — Transport Safi',
-  description: 'Plateforme de matching camion + remorque pour transporteurs marocains',
+  title: 'Dottruck — Transport intelligent au Maroc',
+  description: 'Trouve ta charge en 2 clics. Plateforme de fret pour transporteurs marocains.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
