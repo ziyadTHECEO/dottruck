@@ -4,9 +4,9 @@
 
 **Goal:** Build the FLEEZ TRUCK MVP — une plateforme web de matching camion/remorque pour transporteurs marocains, avec chat temps réel et algorithme de matching Type A+B+C.
 
-**Architecture:** Next.js 14 App Router pour le frontend, Supabase pour la base de données PostgreSQL + Auth + Realtime chat. L'algo de matching est une fonction pure testée en TDD. L'app est déployée sur Vercel et configurée comme PWA.
+**Architecture:** Next.js 16 App Router pour le frontend, Supabase pour la base de données PostgreSQL + Auth + Realtime chat. L'algo de matching est une fonction pure testée en TDD. L'app est déployée sur Vercel et configurée comme PWA.
 
-**Tech Stack:** Next.js 14, Tailwind CSS, Supabase JS v2, Jest (tests unitaires), Vercel (déploiement)
+**Tech Stack:** Next.js 16, Tailwind CSS, Supabase JS v2, Jest (tests unitaires), Vercel (déploiement)
 
 **Design doc :** `docs/plans/2026-05-20-fleez-truck-design.md`
 
