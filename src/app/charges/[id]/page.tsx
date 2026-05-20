@@ -1,6 +1,6 @@
 import { redirect, notFound } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { TopHeader } from '@/components/ui/TopHeader'
 
 async function createMatching(chargeId: string, userId: string) {
   'use server'
@@ -65,63 +65,89 @@ export default async function ChargeDetailPage({
   const createMatchingAction = createMatching.bind(null, id, user.id)
 
   return (
-    <main className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-md mx-auto space-y-6">
-        <div className="flex items-center gap-3">
-          <Link href="/dashboard" className="text-gray-400 hover:text-gray-600 text-xl">←</Link>
-          <h1 className="text-xl font-bold text-gray-900">Détails de la charge</h1>
-        </div>
+    <div className="min-h-screen bg-surface flex flex-col">
+      <TopHeader title="Détails charge" backHref="/dashboard" />
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
-            Erreur lors de la création du matching.
-          </div>
-        )}
-
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
-          <div className="flex justify-between items-start">
-            <h2 className="text-2xl font-bold text-gray-900">
-              {charge.ville_depart} → {charge.ville_arrivee}
-            </h2>
-            <span className="text-2xl font-bold text-orange-600">{charge.prix_total_mad} MAD</span>
-          </div>
-
-          <div className="space-y-2 text-sm text-gray-600">
-            <p><span className="font-medium text-gray-800">Type :</span> {typeLabel[charge.type_requis]}</p>
-            {charge.poids_kg && <p><span className="font-medium text-gray-800">Poids :</span> {charge.poids_kg} kg</p>}
-            {charge.description && <p><span className="font-medium text-gray-800">Description :</span> {charge.description}</p>}
-            <p><span className="font-medium text-gray-800">Commission Fleez (10%) :</span> {Math.round(charge.prix_total_mad * 0.1)} MAD</p>
-            <p><span className="font-medium text-gray-800">Net transporteur(s) :</span> {charge.prix_total_mad - Math.round(charge.prix_total_mad * 0.1)} MAD</p>
+      <main className="flex-1 pb-28 max-w-lg mx-auto w-full">
+        {/* Hero */}
+        <div className="bg-white px-4 py-5 border-b border-border">
+          <h2 className="text-2xl font-bold text-nardo">
+            {charge.description ?? `${charge.ville_depart} → ${charge.ville_arrivee}`}
+          </h2>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-yellow-400 text-sm">★</span>
+            <span className="text-sm text-gray-500">Expéditeur fiable</span>
           </div>
         </div>
 
-        {/* Actions for transporteur */}
-        {userProfile?.role === 'transporteur' && charge.statut === 'ouverte' && (
-          <div>
-            {existingMatching ? (
-              <Link
-                href={`/chat/${existingMatching.id}`}
-                className="block w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition"
-              >
-                Continuer la négociation →
-              </Link>
-            ) : (
-              <form action={createMatchingAction}>
-                <button
-                  type="submit"
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition"
-                >
-                  Je prends cette charge
-                </button>
-              </form>
-            )}
-          </div>
-        )}
+        <div className="divide-y divide-border">
+          {/* Route */}
+          <section className="bg-white px-4 py-4 space-y-3">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Trajet</p>
+            <div className="flex items-start gap-3">
+              <div className="flex flex-col items-center pt-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-accent"></span>
+                <span className="w-px h-8 bg-border my-1"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-nardo"></span>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <p className="font-semibold text-nardo text-base">{charge.ville_depart}</p>
+                  <p className="text-xs text-gray-400">Départ</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-nardo text-base">{charge.ville_arrivee}</p>
+                  <p className="text-xs text-gray-400">Arrivée</p>
+                </div>
+              </div>
+            </div>
+          </section>
 
-        {charge.statut !== 'ouverte' && (
-          <p className="text-center text-gray-500 text-sm">Cette charge n&apos;est plus disponible.</p>
-        )}
+          {/* Cargo info */}
+          <section className="bg-white px-4 py-4 space-y-2">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Charge</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-surface rounded-xl p-3">
+                <p className="text-xs text-gray-400">Poids</p>
+                <p className="font-semibold text-nardo mt-0.5">
+                  {charge.poids_kg ? `${charge.poids_kg} kg` : '—'}
+                </p>
+              </div>
+              <div className="bg-surface rounded-xl p-3">
+                <p className="text-xs text-gray-400">Type requis</p>
+                <p className="font-semibold text-nardo mt-0.5 capitalize">
+                  {charge.type_requis.replace('_', ' ')}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Price */}
+          <section className="bg-white px-4 py-4">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Prix proposé</p>
+            <p className="text-3xl font-bold text-nardo mt-1">
+              {charge.prix_total_mad.toLocaleString()}{' '}
+              <span className="text-lg font-normal text-gray-500">MAD</span>
+            </p>
+            <p className="text-xs text-gray-400 mt-1">Négociable via le chat</p>
+          </section>
+        </div>
+      </main>
+
+      {/* Sticky CTA */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-border p-4">
+        <div className="max-w-lg mx-auto">
+          <form action={createMatchingAction}>
+            <input type="hidden" name="chargeId" value={charge.id} />
+            <button
+              type="submit"
+              className="w-full min-h-[52px] bg-accent hover:bg-accent-hover text-white font-bold rounded-xl transition-all duration-200 text-base"
+            >
+              Accepter cette charge
+            </button>
+          </form>
+        </div>
       </div>
-    </main>
+    </div>
   )
 }

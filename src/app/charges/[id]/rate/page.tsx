@@ -1,7 +1,7 @@
-import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { submitRating } from '../../actions'
+import { TopHeader } from '@/components/ui/TopHeader'
 
 export default async function RatePage({
   params,
@@ -20,55 +20,48 @@ export default async function RatePage({
   if (!userId) return notFound()
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-md p-8 space-y-6">
-        <div className="flex items-center gap-3">
-          <Link href="/dashboard" className="text-gray-400 hover:text-gray-600">←</Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Évaluer le transporteur</h1>
-            {nom && <p className="text-gray-500 mt-1">{decodeURIComponent(nom)}</p>}
+    <div className="min-h-screen bg-surface flex flex-col">
+      <TopHeader title="Évaluation" backHref="/dashboard" />
+
+      <main className="flex-1 flex flex-col items-center justify-center p-6 max-w-md mx-auto w-full">
+        <div className="text-center space-y-2 mb-8">
+          <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto">
+            <span className="text-2xl">⭐</span>
           </div>
+          <h2 className="text-xl font-bold text-nardo">Évaluez {nom ? decodeURIComponent(nom) : 'le transporteur'}</h2>
+          <p className="text-gray-500 text-sm">Votre avis aide la communauté Dottruck</p>
         </div>
 
-        <form action={submitRating} className="space-y-6">
+        <form action={submitRating} className="w-full space-y-6">
           <input type="hidden" name="charge_id" value={chargeId} />
           <input type="hidden" name="to_user_id" value={userId} />
 
-          <div>
-            <p className="font-medium text-gray-700 mb-3">Note globale</p>
-            <div className="flex gap-2">
-              {[1, 2, 3, 4, 5].map(n => (
-                <label key={n} className="flex-1">
-                  <input type="radio" name="note" value={n} required className="sr-only peer" />
-                  <span className="flex flex-col items-center justify-center border-2 border-gray-200 rounded-xl p-3 cursor-pointer peer-checked:border-orange-500 peer-checked:bg-orange-50 hover:border-orange-300 transition">
-                    <span className="text-xl">{'★'.repeat(n)}</span>
-                    <span className="text-xs text-gray-500 mt-1">{n}</span>
-                  </span>
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-600 text-center">Note</p>
+            <div className="flex justify-center gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <label key={star} className="cursor-pointer">
+                  <input type="radio" name="note" value={star} required className="sr-only" />
+                  <span className="text-4xl text-gray-300 hover:text-yellow-400 transition-colors">★</span>
                 </label>
               ))}
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Commentaire <span className="text-gray-400 font-normal">(optionnel)</span>
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-600">
+              Commentaire <span className="text-gray-400">— optionnel</span>
             </label>
-            <textarea
-              name="commentaire"
-              rows={3}
-              placeholder="À l'heure ? Professionnel ? Recommandé ?"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
+            <textarea name="commentaire" rows={3} placeholder="Ex: Ponctuel, professionnel..."
+              className="w-full border border-border rounded-xl px-4 py-3 text-base text-nardo placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all bg-white resize-none" />
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition"
-          >
+          <button type="submit"
+            className="w-full min-h-[52px] bg-accent hover:bg-accent-hover text-white font-bold rounded-xl transition-all duration-200 text-base">
             Envoyer l&apos;évaluation
           </button>
         </form>
-      </div>
-    </main>
+      </main>
+    </div>
   )
 }
