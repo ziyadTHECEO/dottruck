@@ -2,45 +2,56 @@ import Link from 'next/link'
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-orange-50 flex flex-col items-center justify-center p-6">
-      <div className="max-w-md w-full text-center space-y-8">
-        {/* Logo */}
-        <div>
-          <h1 className="text-4xl font-bold text-orange-600">FLEEZ TRUCK</h1>
-          <p className="text-gray-600 mt-2">Transport intelligent au Maroc</p>
+    <main className="min-h-screen bg-surface flex flex-col">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 max-w-md mx-auto w-full space-y-10">
+
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-bold text-nardo tracking-tight">Dottruck</h1>
+          <p className="text-gray-500 text-base">Transport intelligent au Maroc</p>
         </div>
 
-        {/* Choix du rôle */}
-        <div className="space-y-4">
-          <p className="text-lg font-medium text-gray-800">Qui êtes-vous ?</p>
+        <div className="text-center space-y-3">
+          <p className="text-3xl font-bold text-nardo leading-tight">
+            Les appels,<br />c&apos;est fini.
+          </p>
+          <p className="text-gray-500 text-base">
+            Trouve ton chargement en 2 clics
+          </p>
+        </div>
 
+        <ul className="space-y-3 w-full">
+          {[
+            "Pas d'appels téléphoniques",
+            'Transparent sur les prix',
+            'Connexion directe',
+          ].map((benefit) => (
+            <li key={benefit} className="flex items-center gap-3 text-gray-600 text-base">
+              <span className="w-5 h-5 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs font-bold shrink-0">✓</span>
+              {benefit}
+            </li>
+          ))}
+        </ul>
+
+        <div className="w-full space-y-3">
           <Link
             href="/auth/signup?role=transporteur"
-            className="block w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-6 rounded-xl transition text-lg"
+            className="flex items-center justify-center w-full min-h-[52px] bg-accent hover:bg-accent-hover text-white font-semibold rounded-xl transition-all duration-200 text-base"
           >
             Je suis Transporteur
-            <span className="block text-sm font-normal opacity-80 mt-1">
-              J&apos;ai un camion, une remorque, ou les deux
-            </span>
           </Link>
-
           <Link
             href="/auth/signup?role=expéditeur"
-            className="block w-full bg-white hover:bg-gray-50 text-gray-800 font-semibold py-4 px-6 rounded-xl transition text-lg border-2 border-gray-200"
+            className="flex items-center justify-center w-full min-h-[52px] bg-white border border-border text-nardo font-semibold rounded-xl hover:bg-surface transition-all duration-200 text-base"
           >
             Je suis Expéditeur
-            <span className="block text-sm font-normal text-gray-500 mt-1">
-              J&apos;ai des marchandises à transporter
-            </span>
           </Link>
+          <p className="text-center text-sm text-gray-500">
+            Déjà un compte ?{' '}
+            <Link href="/auth/login" className="text-accent font-medium hover:underline">
+              Se connecter
+            </Link>
+          </p>
         </div>
-
-        <p className="text-sm text-gray-500">
-          Déjà un compte ?{' '}
-          <Link href="/auth/login" className="text-orange-600 font-medium hover:underline">
-            Se connecter
-          </Link>
-        </p>
       </div>
     </main>
   )

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { signIn } from '../actions'
+import { TopHeader } from '@/components/ui/TopHeader'
 
 export default async function LoginPage({
   searchParams,
@@ -10,49 +11,57 @@ export default async function LoginPage({
   const error = params.error
 
   return (
-    <main className="min-h-screen bg-orange-50 flex items-center justify-center p-6">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-md p-8 space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Connexion</h1>
-          <p className="text-gray-500 mt-1">Bienvenue sur FLEEZ TRUCK</p>
+    <div className="min-h-screen bg-surface flex flex-col">
+      <TopHeader title="Connexion" backHref="/" />
+
+      <main className="flex-1 flex items-center justify-center p-6">
+        <div className="w-full max-w-md space-y-8">
+          <div>
+            <h2 className="text-2xl font-bold text-nardo">Bienvenue</h2>
+            <p className="text-gray-500 mt-1 text-base">Connectez-vous à votre compte Dottruck</p>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-error rounded-xl p-4 text-sm">
+              {decodeURIComponent(error)}
+            </div>
+          )}
+
+          <form action={signIn} className="space-y-4">
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-600">Email</label>
+              <input
+                name="email" type="email" required
+                className="w-full border border-border rounded-xl px-4 py-3 text-base text-nardo placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all duration-200 bg-white min-h-[48px]"
+                placeholder="exemple@email.com"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-600">Mot de passe</label>
+              <input
+                name="password" type="password" required
+                className="w-full border border-border rounded-xl px-4 py-3 text-base text-nardo placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all duration-200 bg-white min-h-[48px]"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full min-h-[52px] bg-accent hover:bg-accent-hover text-white font-semibold rounded-xl transition-all duration-200 text-base"
+            >
+              Se connecter
+            </button>
+          </form>
+
+          <p className="text-sm text-gray-500 text-center">
+            Pas encore de compte ?{' '}
+            <Link href="/" className="text-accent font-medium hover:underline">
+              S&apos;inscrire
+            </Link>
+          </p>
         </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
-            {decodeURIComponent(error)}
-          </div>
-        )}
-
-        <form action={signIn} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              name="email" type="email" required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
-            <input
-              name="password" type="password" required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition"
-          >
-            Se connecter
-          </button>
-        </form>
-
-        <p className="text-sm text-gray-500 text-center">
-          Pas encore de compte ?{' '}
-          <Link href="/" className="text-orange-600 font-medium hover:underline">
-            S&apos;inscrire
-          </Link>
-        </p>
-      </div>
-    </main>
+      </main>
+    </div>
   )
 }
