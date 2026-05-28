@@ -1,6 +1,6 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { signUp } from '../actions'
-import { TopHeader } from '@/components/ui/TopHeader'
 
 const VILLES = ['Safi', 'Casablanca', 'Marrakech', 'Agadir', 'Rabat', 'Tanger', 'Fes', 'Meknes']
 
@@ -16,10 +16,11 @@ export default async function SignUpPage({
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <TopHeader title="Inscription" backHref="/" />
-
       <main className="flex-1 p-6 max-w-md mx-auto w-full space-y-6">
-        <div>
+        <div className="flex flex-col items-center pt-4 pb-2">
+          <Link href="/" className="mb-4">
+            <Image src="/logo-icon.png" alt="Dottruck" width={64} height={64} priority />
+          </Link>
           <h2 className="text-xl font-bold text-nardo">Quel est votre role ?</h2>
         </div>
 

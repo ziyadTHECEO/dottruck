@@ -1,6 +1,6 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { signIn } from '../actions'
-import { TopHeader } from '@/components/ui/TopHeader'
 
 export default async function LoginPage({
   searchParams,
@@ -12,11 +12,12 @@ export default async function LoginPage({
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <TopHeader title="Connexion" backHref="/" />
-
       <main className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md space-y-8">
-          <div>
+          <div className="flex flex-col items-center">
+            <Link href="/" className="mb-6">
+              <Image src="/logo-icon.png" alt="Dottruck" width={72} height={72} priority />
+            </Link>
             <h2 className="text-2xl font-bold text-nardo">Bienvenue</h2>
             <p className="text-muted mt-1 text-sm">Connectez-vous a votre compte Dottruck</p>
           </div>
