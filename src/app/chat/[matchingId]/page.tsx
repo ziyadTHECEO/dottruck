@@ -31,7 +31,7 @@ export default async function ChatPage({
 
   return (
     <div className="h-screen flex flex-col">
-      <TopHeader title="Négociation" backHref="/dashboard" />
+      <TopHeader title="Negociation" backHref="/messages" />
 
       <ChatRoom
         matchingId={matchingId}

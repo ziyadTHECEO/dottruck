@@ -9,8 +9,14 @@ export async function proxy(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() { return request.cookies.getAll() },
+        getAll() {
+          return request.cookies.getAll()
+        },
         setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          )
+          supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           )
@@ -21,16 +27,31 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const protectedPaths = ['/dashboard', '/charges', '/profile', '/matching', '/chat', '/notifications']
-  const isProtected = protectedPaths.some(p => request.nextUrl.pathname.startsWith(p))
+  const { pathname } = request.nextUrl
 
+  // Public routes
+  const publicRoutes = ['/', '/auth/login', '/auth/signup']
+  const isPublicRoute = publicRoutes.some(route => pathname === route)
+
+  // Protected paths
+  const protectedPaths = ['/dashboard', '/charges', '/profile', '/matching', '/chat', '/notifications', '/messages', '/history', '/booking']
+  const isProtected = protectedPaths.some(p => pathname.startsWith(p))
+
+  // Not logged in + protected route → redirect to login
   if (!user && isProtected) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
+  }
+
+  // Logged in + public auth pages → redirect to dashboard
+  if (user && isPublicRoute) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return supabaseResponse
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|logo-icon.png|logo-text.png|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }

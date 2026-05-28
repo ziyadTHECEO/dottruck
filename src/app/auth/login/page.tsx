@@ -11,14 +11,14 @@ export default async function LoginPage({
   const error = params.error
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <TopHeader title="Connexion" backHref="/" />
 
       <main className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md space-y-8">
           <div>
             <h2 className="text-2xl font-bold text-nardo">Bienvenue</h2>
-            <p className="text-gray-500 mt-1 text-base">Connectez-vous à votre compte Dottruck</p>
+            <p className="text-muted mt-1 text-sm">Connectez-vous a votre compte Dottruck</p>
           </div>
 
           {error && (
@@ -28,35 +28,35 @@ export default async function LoginPage({
           )}
 
           <form action={signIn} className="space-y-4">
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-600">Email</label>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-nardo">Email</label>
               <input
                 name="email" type="email" required
-                className="w-full border border-border rounded-xl px-4 py-3 text-base text-nardo placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all duration-200 bg-white min-h-[48px]"
+                className="w-full border border-border rounded-xl px-4 py-3 text-base text-nardo placeholder-muted/50 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors bg-white min-h-[48px]"
                 placeholder="exemple@email.com"
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-600">Mot de passe</label>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-nardo">Mot de passe</label>
               <input
                 name="password" type="password" required
-                className="w-full border border-border rounded-xl px-4 py-3 text-base text-nardo placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all duration-200 bg-white min-h-[48px]"
+                className="w-full border border-border rounded-xl px-4 py-3 text-base text-nardo placeholder-muted/50 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors bg-white min-h-[48px]"
                 placeholder="••••••••"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full min-h-[52px] bg-accent hover:bg-accent-hover text-white font-semibold rounded-xl transition-all duration-200 text-base"
+              className="w-full min-h-[52px] bg-accent hover:bg-accent-hover text-white font-semibold rounded-xl transition-colors text-base cursor-pointer"
             >
               Se connecter
             </button>
           </form>
 
-          <p className="text-sm text-gray-500 text-center">
+          <p className="text-sm text-muted text-center">
             Pas encore de compte ?{' '}
-            <Link href="/" className="text-accent font-medium hover:underline">
+            <Link href="/" className="text-accent font-semibold hover:underline">
               S&apos;inscrire
             </Link>
           </p>
