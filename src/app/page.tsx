@@ -16,13 +16,6 @@ export default function HomePage() {
             className="mb-5"
             priority
           />
-          <Image
-            src="/logo-text.png"
-            alt="DOTTRUCK"
-            width={220}
-            height={44}
-            priority
-          />
           <p className="text-muted text-sm mt-3">Transport de fret au Maroc</p>
         </div>
 
