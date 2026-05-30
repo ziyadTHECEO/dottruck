@@ -1,76 +1,70 @@
-import Link from 'next/link'
-import { setupTransporteurProfile } from '../actions'
-import { TopHeader } from '@/components/ui/TopHeader'
-
-const vehicleOptions = [
-  { value: 'C', label: 'Camion + Remorque', desc: "J'ai les deux, je peux accepter toute charge" },
-  { value: 'A', label: 'Camion seul', desc: 'Je cherche un partenaire avec une remorque' },
-  { value: 'B', label: 'Remorque seule', desc: 'Je cherche un partenaire avec un camion' },
-]
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import TransporteurSetupWizard from '@/components/TransporteurSetupWizard'
+import TransporteurProfileView from '@/components/TransporteurProfileView'
 
 export default async function ProfileSetupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>
+  searchParams: Promise<{ resend?: string; fields?: string }>
 }) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return redirect('/auth/login')
+
   const params = await searchParams
+  const isResend = params.resend === 'true'
+  const targetFields = params.fields?.split(',').filter(Boolean) ?? []
 
-  return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <TopHeader title="Profil" backHref="/dashboard" />
+  // Check if the user already has a profile with documents
+  const { data: existingProfile } = await supabase
+    .from('transporteur_profiles')
+    .select('vehicle_type, photo_carte_grise, photo_autorisation, photo_vehicule, verification_status')
+    .eq('user_id', user.id)
+    .single()
 
-      <main className="flex-1 p-6 max-w-md mx-auto w-full space-y-6">
-        <div>
-          <h2 className="text-xl font-bold text-nardo">Type de vehicule</h2>
-          <p className="text-muted mt-1 text-sm">Selectionnez votre equipement</p>
-        </div>
+  // If resend mode, fetch the latest resend notification for context (body + audio)
+  let resendNotification: { body: string; audio_url: string | null } | null = null
+  if (isResend) {
+    const { data } = await supabase
+      .from('notifications')
+      .select('body, audio_url')
+      .eq('user_id', user.id)
+      .eq('type', 'verification_resend')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
 
-        {params.error && (
-          <div className="bg-red-50 border border-red-200 text-error rounded-xl p-4 text-sm">
-            {decodeURIComponent(params.error)}
-          </div>
-        )}
+    resendNotification = data
+  }
 
-        <form action={setupTransporteurProfile} className="space-y-3">
-          {vehicleOptions.map((opt) => (
-            <label
-              key={opt.value}
-              className="flex items-start gap-4 border-2 border-border rounded-xl p-4 cursor-pointer hover:border-accent/50 has-[:checked]:border-accent has-[:checked]:bg-accent/5 transition-colors bg-white"
-            >
-              <input type="radio" name="type" value={opt.value} required className="mt-0.5 accent-[#1D4ED8]" />
-              <div>
-                <p className="font-semibold text-nardo text-sm">{opt.label}</p>
-                <p className="text-xs text-muted mt-0.5">{opt.desc}</p>
-              </div>
-            </label>
-          ))}
+  // If resend mode → show the wizard in resend mode
+  if (isResend && targetFields.length > 0) {
+    return (
+      <TransporteurSetupWizard
+        userId={user.id}
+        resendMode={{ targetFields, message: resendNotification?.body ?? null, audioUrl: resendNotification?.audio_url ?? null }}
+      />
+    )
+  }
 
-          <div className="space-y-1.5 pt-2">
-            <label className="block text-sm font-medium text-nardo">
-              Description du vehicule <span className="text-muted/60">(optionnel)</span>
-            </label>
-            <textarea
-              name="description_vehicule"
-              rows={3}
-              placeholder="Ex: Mercedes 15T, Safi, disponible weekend..."
-              className="w-full border border-border rounded-xl px-4 py-3 text-base text-nardo placeholder-muted/50 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors bg-white resize-none"
-            />
-          </div>
+  // If user already submitted profile with at least one document → show profile view
+  if (existingProfile && (existingProfile.photo_carte_grise || existingProfile.photo_autorisation || existingProfile.photo_vehicule)) {
+    const { data: userInfo } = await supabase
+      .from('users')
+      .select('nom, email, phone, ville, avatar_url')
+      .eq('id', user.id)
+      .single()
 
-          <button
-            type="submit"
-            className="w-full min-h-[52px] bg-accent hover:bg-accent-hover text-white font-semibold rounded-xl transition-colors text-base cursor-pointer"
-          >
-            Continuer
-          </button>
-        </form>
+    return (
+      <TransporteurProfileView
+        profile={existingProfile}
+        user={userInfo}
+      />
+    )
+  }
 
-        <p className="text-center">
-          <Link href="/dashboard" className="text-sm text-muted hover:text-accent transition-colors">
-            Passer cette etape
-          </Link>
-        </p>
-      </main>
-    </div>
-  )
+  // Otherwise show the normal setup wizard
+  return <TransporteurSetupWizard userId={user.id} />
 }

@@ -1,7 +1,12 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
+import { useTranslation } from '@/lib/i18n/context'
 
 export default function HomePage() {
+  const { t } = useTranslation()
+
   return (
     <main className="min-h-screen bg-white flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-16 max-w-md mx-auto w-full">
@@ -16,25 +21,25 @@ export default function HomePage() {
             className="mb-5"
             priority
           />
-          <p className="text-muted text-sm mt-3">Transport de fret au Maroc</p>
+          <p className="text-muted text-sm mt-3">{t('landing_subtitle')}</p>
         </div>
 
         {/* Tagline */}
         <div className="text-center mb-10">
           <p className="text-2xl font-bold text-nardo leading-snug">
-            Les appels,<br />c&apos;est fini.
+            {t('landing_tagline1').split('\n').map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}
           </p>
           <p className="text-muted text-base mt-2">
-            Trouve ton chargement en 2 clics
+            {t('landing_tagline2')}
           </p>
         </div>
 
         {/* Benefits */}
         <ul className="space-y-3 w-full mb-10">
           {[
-            { text: "Pas d'appels", desc: 'Tout se fait via la plateforme' },
-            { text: 'Prix transparents', desc: 'Voir le prix avant de postuler' },
-            { text: 'Connexion directe', desc: 'Chat en temps réel' },
+            { text: t('landing_benefit1_title'), desc: t('landing_benefit1_desc') },
+            { text: t('landing_benefit2_title'), desc: t('landing_benefit2_desc') },
+            { text: t('landing_benefit3_title'), desc: t('landing_benefit3_desc') },
           ].map((benefit) => (
             <li key={benefit.text} className="flex items-start gap-3">
               <span className="w-6 h-6 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 mt-0.5">
@@ -56,18 +61,18 @@ export default function HomePage() {
             href="/auth/signup?role=transporteur"
             className="flex items-center justify-center w-full min-h-[52px] bg-accent hover:bg-accent-hover text-white font-semibold rounded-xl transition-colors duration-200 text-base"
           >
-            Je suis Transporteur
+            {t('landing_transporteur')}
           </Link>
           <Link
             href="/auth/signup?role=exp%C3%A9diteur"
             className="flex items-center justify-center w-full min-h-[52px] bg-white border-2 border-border text-nardo font-semibold rounded-xl hover:border-accent/40 hover:bg-surface transition-colors duration-200 text-base"
           >
-            Je suis Expediteur
+            {t('landing_expediteur')}
           </Link>
           <p className="text-center text-sm text-muted pt-2">
-            Deja un compte ?{' '}
+            {t('landing_has_account')}{' '}
             <Link href="/auth/login" className="text-accent font-semibold hover:underline">
-              Se connecter
+              {t('landing_login')}
             </Link>
           </p>
         </div>

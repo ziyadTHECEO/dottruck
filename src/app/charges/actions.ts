@@ -14,7 +14,11 @@ export async function publishCharge(formData: FormData) {
   const ville_arrivee = formData.get('ville_arrivee') as string
   const description = formData.get('description') as string
   const poids_kg = formData.get('poids_kg') ? parseInt(formData.get('poids_kg') as string) : null
+  const is_conteneur = formData.get('is_conteneur') === 'true'
+  const largeur_cm = is_conteneur && formData.get('largeur_cm') ? parseInt(formData.get('largeur_cm') as string) : null
+  const hauteur_cm = is_conteneur && formData.get('hauteur_cm') ? parseInt(formData.get('hauteur_cm') as string) : null
   const prix_total_mad = parseInt(formData.get('prix_total_mad') as string)
+  const audio_url = formData.get('audio_url') as string | null
 
   const { error } = await supabase.from('charges').insert({
     expediteur_id: user.id,
@@ -23,7 +27,11 @@ export async function publishCharge(formData: FormData) {
     ville_arrivee,
     description: description || null,
     poids_kg,
+    is_conteneur,
+    largeur_cm,
+    hauteur_cm,
     prix_total_mad,
+    audio_url: audio_url || null,
   })
 
   if (error) {

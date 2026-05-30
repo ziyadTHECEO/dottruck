@@ -16,13 +16,33 @@ export function NotificationBar({ userId }: { userId: string }) {
   const supabase = createClient()
 
   const fetchUnread = async () => {
-    // Get all matchings the user is part of
-    const { data: matchings } = await supabase
+    // Get matchings as transporteur
+    const { data: transporteurMatchings } = await supabase
       .from('matchings')
       .select('id, charges(ville_depart, ville_arrivee)')
       .or(`transporteur_camion_id.eq.${userId},transporteur_remorque_id.eq.${userId},transporteur_complet_id.eq.${userId}`)
 
-    if (!matchings || matchings.length === 0) return
+    // Get matchings as expéditeur (via charges)
+    const { data: myCharges } = await supabase
+      .from('charges')
+      .select('id')
+      .eq('expediteur_id', userId)
+
+    let expediteurMatchings: typeof transporteurMatchings = []
+    if (myCharges && myCharges.length > 0) {
+      const { data } = await supabase
+        .from('matchings')
+        .select('id, charges(ville_depart, ville_arrivee)')
+        .in('charge_id', myCharges.map(c => c.id))
+      expediteurMatchings = data ?? []
+    }
+
+    // Merge and deduplicate
+    const all = [...(transporteurMatchings ?? []), ...(expediteurMatchings ?? [])]
+    const seen = new Set<string>()
+    const matchings = all.filter(m => { if (seen.has(m.id)) return false; seen.add(m.id); return true })
+
+    if (matchings.length === 0) { setUnreadChats([]); return }
 
     // For each matching, count messages not from current user in last 24h
     const results: UnreadChat[] = []
@@ -59,7 +79,7 @@ export function NotificationBar({ userId }: { userId: string }) {
   return (
     <div className="bg-accent text-white px-4 py-2">
       <div className="max-w-2xl mx-auto flex flex-wrap gap-3 items-center">
-        <span className="text-sm font-semibold">Nouveaux messages :</span>
+        <span className="text-sm font-semibold">رسائل جديدة:</span>
         {unreadChats.map(chat => (
           <Link
             key={chat.matchingId}

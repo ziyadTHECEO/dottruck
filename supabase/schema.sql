@@ -14,6 +14,7 @@ create table if not exists public.users (
   phone text,
   nom text,
   avatar_url text,
+  preferred_language text default 'ar',
   created_at timestamptz default now()
 );
 
@@ -62,8 +63,9 @@ create table if not exists public.messages (
   id uuid default uuid_generate_v4() primary key,
   matching_id uuid references public.matchings(id) on delete cascade,
   sender_id uuid references public.users(id),
-  contenu text not null,
+  contenu text,
   lu boolean default false,
+  audio_url text,
   created_at timestamptz default now()
 );
 

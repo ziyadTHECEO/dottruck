@@ -3,11 +3,13 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useTranslation } from '@/lib/i18n/context'
+import type { TranslationKey } from '@/lib/i18n/translations'
 
 const navItems = [
   {
     href: '/dashboard',
-    label: 'Accueil',
+    labelKey: 'nav_home' as TranslationKey,
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
@@ -17,7 +19,7 @@ const navItems = [
   },
   {
     href: '/messages',
-    label: 'Messages',
+    labelKey: 'nav_messages' as TranslationKey,
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
@@ -26,7 +28,7 @@ const navItems = [
   },
   {
     href: '/history',
-    label: 'Historique',
+    labelKey: 'nav_history' as TranslationKey,
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" />
@@ -36,7 +38,7 @@ const navItems = [
   },
   {
     href: '/notifications',
-    label: 'Alertes',
+    labelKey: 'nav_alerts' as TranslationKey,
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -47,7 +49,7 @@ const navItems = [
   },
   {
     href: '/profile/settings',
-    label: 'Profil',
+    labelKey: 'nav_profile' as TranslationKey,
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
@@ -59,6 +61,7 @@ const navItems = [
 
 export function BottomNav() {
   const pathname = usePathname()
+  const { t } = useTranslation()
   const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(() => {
@@ -106,7 +109,7 @@ export function BottomNav() {
                   </span>
                 )}
               </div>
-              <span className={`text-[10px] ${active ? 'font-semibold' : 'font-medium'}`}>{item.label}</span>
+              <span className={`text-[10px] ${active ? 'font-semibold' : 'font-medium'}`}>{t(item.labelKey)}</span>
             </Link>
           )
         })}
