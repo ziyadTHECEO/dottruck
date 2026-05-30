@@ -90,8 +90,11 @@ export function ChatRoom({ matchingId, currentUserId, prixTotal, transporteurNam
   const supabase = createClient()
   const { t, lang } = useTranslation()
 
-  const commission = Math.round(prixTotal * 0.04)
-  const netAPayer = prixTotal - commission
+  // Use agreed price if available, otherwise original charge price
+  const acceptedProposal = proposals.find(p => p.status === 'accepted')
+  const agreedPrice = acceptedProposal ? acceptedProposal.amount_mad : prixTotal
+  const commission = Math.round(agreedPrice * 0.04)
+  const netAPayer = agreedPrice - commission
 
   function formatDate(dateStr: string): string {
     const d = new Date(dateStr)
@@ -290,7 +293,7 @@ export function ChatRoom({ matchingId, currentUserId, prixTotal, transporteurNam
       <div className="bg-accent/5 border-b border-accent/20 px-4 py-3">
         <p className="text-sm font-semibold text-nardo">{t('chat_payment_split')}</p>
         <div className="flex gap-4 mt-1 text-sm text-muted flex-wrap">
-          <span>{t('chat_total')} : <strong className="text-nardo">{prixTotal.toLocaleString()} MAD</strong></span>
+          <span>{t('chat_total')} : <strong className="text-nardo">{agreedPrice.toLocaleString()} MAD</strong></span>
           <span>{t('chat_commission')} : <strong className="text-nardo">{commission.toLocaleString()} MAD</strong></span>
           <span>{t('chat_net')} : <strong className="text-nardo">{netAPayer.toLocaleString()} MAD</strong></span>
         </div>

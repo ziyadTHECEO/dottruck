@@ -35,12 +35,33 @@ export async function sendMessage(
     .eq('id', matchingId)
     .single()
 
-  if (!matching || matching.statut !== 'accepté') {
-    return {
-      success: false,
-      error: 'خاص تتافقو على الثمن قبل ما تهضرو. استعمل زر "اقترح الثمن".',
-      errorType: 'blocked',
+  if (!matching) {
+    return { success: false, error: 'Matching not found', errorType: 'db' }
+  }
+
+  if (matching.statut !== 'accepté') {
+    // Fallback: check if a price proposal was accepted (covers broken statut updates)
+    const { data: acceptedProposal } = await supabase
+      .from('price_proposals')
+      .select('id')
+      .eq('matching_id', matchingId)
+      .eq('status', 'accepted')
+      .limit(1)
+      .maybeSingle()
+
+    if (!acceptedProposal) {
+      return {
+        success: false,
+        error: 'خاص تتافقو على الثمن قبل ما تهضرو. استعمل زر "اقترح الثمن".',
+        errorType: 'blocked',
+      }
     }
+
+    // Fix the matching statut (self-healing)
+    await supabase
+      .from('matchings')
+      .update({ statut: 'accepté' })
+      .eq('id', matchingId)
   }
 
   // Filter text content (skip for voice-only messages)
