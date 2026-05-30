@@ -25,14 +25,14 @@ async function cancelMatching(matchingId: string) {
   const transporteurId = matching.transporteur_complet_id ?? matching.transporteur_camion_id ?? matching.transporteur_remorque_id
   const isParticipant = user.id === transporteurId || user.id === charge?.expediteur_id
 
-  if (!isParticipant || matching.statut === 'accepté') {
+  if (!isParticipant || matching.statut === 'completé' || matching.statut === 'refusé') {
     return redirect(`/chat/${matchingId}`)
   }
 
   // Cancel the matching
   await supabase
     .from('matchings')
-    .update({ statut: 'annulee' })
+    .update({ statut: 'refusé' })
     .eq('id', matchingId)
 
   // Revert charge to ouverte
@@ -96,7 +96,7 @@ export default async function ChatPage({
     .eq('matching_id', matchingId)
     .order('created_at', { ascending: true })
 
-  const canCancel = matching.statut !== 'accepté' && matching.statut !== 'annulee'
+  const canCancel = matching.statut !== 'completé' && matching.statut !== 'refusé'
   const cancelAction = cancelMatching.bind(null, matchingId)
 
   return (

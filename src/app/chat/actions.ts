@@ -148,14 +148,11 @@ export async function respondToProposal(
     .update({ status: response })
     .eq('id', proposalId)
 
-  // If accepted, update matching
+  // If accepted, update matching statut
   if (response === 'accepted') {
     await supabase
       .from('matchings')
-      .update({
-        prix_final: proposal.amount_mad,
-        statut: 'accepté',
-      })
+      .update({ statut: 'accepté' })
       .eq('id', proposal.matching_id)
   }
 
